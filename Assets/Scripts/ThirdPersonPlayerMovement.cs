@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ThirdPersonPlayerMovement : MonoBehaviour
 {
-    [SerializeField] float moveSpeed = 6f, rotSpeed = 12f, jumpForce = 100f;
+    [SerializeField] float moveSpeed = 6f, jumpForce = 100f;
     [SerializeField] Transform cameraPivot, groundCheckPos;
     [SerializeField] Rigidbody rb;
     [SerializeField] LayerMask groundLayers;
@@ -32,10 +32,17 @@ public class ThirdPersonPlayerMovement : MonoBehaviour
                 rb.AddForce(0, jumpForce, 0);
             }
         }
+
+        // if player hits escape, go to main menu
+        if(Input.GetButtonDown("Cancel"))
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
+        }
     }
 
     private void FixedUpdate()
     {
+        // get the input direction and the camera direction
         Vector3 input = new Vector3(horizontal, 0, vertical);
         Vector3 camForward = cameraPivot.forward;
         Vector3 camRight = cameraPivot.right;

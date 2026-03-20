@@ -5,8 +5,24 @@ using UnityEngine.SceneManagement;
 
 public class MenuButtons : MonoBehaviour
 {
-    void StartButton()
+    private void Start()
     {
-
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
+
+    public void StartButton()
+    {
+        SceneManager.LoadScene("SampleScene");
+    }
+
+    public void BackToMenuButton()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
+
+    public void QuitButton()
+    {
+        Application.Quit();
+    }    
 }
