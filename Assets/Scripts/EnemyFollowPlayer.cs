@@ -13,7 +13,12 @@ public class EnemyFollowPlayer : MonoBehaviour
     EnemyStates currentState;
     [SerializeField] float chaseRange = 10f,
         patrolDistance = 10f, idleTime = 3f,
-        idleTimer;
+        idleTimer, stopChaseRange = 15f;
+
+    private Vector3 patrolTarget;
+    private bool isPatrolTargetSet = false;
+
+    public LayerMask groundLayers;
 
     // Start is called before the first frame update
     void Start()
@@ -56,6 +61,8 @@ public class EnemyFollowPlayer : MonoBehaviour
     
     void IdleState()
     {
+        Debug.Log("Idle State");
+
         idleTimer -= Time.deltaTime;
 
         if(idleTimer <= 0)
@@ -74,17 +81,49 @@ public class EnemyFollowPlayer : MonoBehaviour
     void PatrolState()
     {
         Debug.Log("Patrol State");
+
+        if(!isPatrolTargetSet) FindPatrolTarget();
+        if(isPatrolTargetSet) agent.SetDestination(patrolTarget);
+
+        Vector3 distanceToPatrol = transform.position - patrolTarget;
+        if (distanceToPatrol.magnitude <= 1f)
+        {
+            isPatrolTargetSet = false;
+            currentState = EnemyStates.Idle;
+        }
+
+        if (Vector3.Distance(transform.position, target.position) < chaseRange)
+        {
+            isPatrolTargetSet = false;
+            currentState = EnemyStates.Chase;
+        }
     }
 
     void ChaseState()
     {
+        Debug.Log("Chase State");
+
         agent.SetDestination(target.position);
 
         float distance = Vector3.Distance(transform.position, target.position);
 
-        if(distance > chaseRange)
+        if(distance > stopChaseRange)
         {
             currentState = EnemyStates.Idle;
+        }
+    }
+
+    private void FindPatrolTarget()
+    {
+        float randomX = Random.Range(-patrolDistance, patrolDistance);
+        float randomZ = Random.Range(-patrolDistance, patrolDistance);
+
+        patrolTarget = new Vector3(transform.position.x + randomX,
+            transform.position.y, transform.position.z + randomZ);
+
+        if(Physics.Raycast(patrolTarget, Vector3.down, 2f, groundLayers))
+        {
+            isPatrolTargetSet = true;
         }
     }
 }
